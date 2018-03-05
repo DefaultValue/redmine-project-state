@@ -1,0 +1,32 @@
+<div class="box tabular settings">
+    <% all_issue_statuses.each do |status| %>
+      <p>
+        <%= label_tag "settings[#{status.name.parameterize.underscore}]", status.name %>
+        <%= text_field_tag "settings[#{status.name.parameterize.underscore}]", (defined?(settings) && settings && settings.include?(status.name.parameterize.underscore)) ? settings[status.name.parameterize.underscore] : '', :class => 'status_color' %>
+      </p>
+    <% end %>
+</div>
+
+<script>
+    (function () {
+        "use strict";
+        (function ($) {
+            var $inputStatusColor = $(".status_color");
+            $inputStatusColor.on("focusout", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var $this = $(this);
+                var color = $this.val();
+                $this.attr('style', 'background-color: '+ color +';');
+            });
+
+            $(document).ready(function () {
+                var $statusColors = $(".status_color");
+                    $statusColors.each(function () {
+                        $(this).attr('style', 'background-color: '+ $(this).val() +';');
+                    })
+                }
+            )
+        })(jQuery);
+    })();
+</script>
