@@ -6,6 +6,7 @@ Redmine::Plugin.register :project_state do
   description 'Plugin provides functionality to track project state with ability to set issue status coloring options.'
   version '1.0'
   author_url 'http://default-value.com/'
+  url 'https://github.com/DefaultValue/redmine-project-state'
 
   menu :project_menu, :state, { :controller => 'state', :action => 'index' }, :caption => :project_menu_state
 
