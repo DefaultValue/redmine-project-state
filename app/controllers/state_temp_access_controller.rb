@@ -1,7 +1,7 @@
-class StateController < ApplicationController
+class StateTempAccessController < ApplicationController
   default_search_scope :issues
 
-  before_filter :find_project, :authorize, :only => :index
+  layout 'temp_access_base'
 
   include StateQueriesHelper
   include BoardsHelper
@@ -22,12 +22,9 @@ class StateController < ApplicationController
   helper :project_state_settings
   helper :project_version_statistic
 
-  def find_project
-    # @project variable must be set before calling the authorize filter
-    @project = Project.find(params[:id])
-  end
-
   def index
+    @project = Project.find(params[:id])
+
     retrieve_query
 
     if @query.valid?
