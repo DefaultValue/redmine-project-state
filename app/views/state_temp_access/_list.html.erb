@@ -25,7 +25,7 @@
             </td>
           </tr>
         <% end %>
-        <%= prepare_version_row(issue) %>
+        <%== prepare_version_row(issue) %>
 
         <tr id="issue-<%= issue.id %>" class="hascontextmenu <%= cycle('odd', 'even') %> <%= issue.css_classes %> <%= level > 0 ? "idnt idnt-#{level}" : nil %>" style="background-color: <%= color_from_status(issue.status.name) %>">
           <% query.inline_columns.each do |column| %>
