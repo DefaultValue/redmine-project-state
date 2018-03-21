@@ -19,7 +19,8 @@ class StateIssueQuery < Query
       QueryColumn.new(:relations, :caption => :label_related_issues),
       QueryColumn.new(:attachments, :caption => :label_attachment_plural),
       QueryColumn.new(:description, :inline => false),
-      QueryColumn.new(:last_notes, :caption => :label_last_notes, :inline => false)
+      QueryColumn.new(:last_notes, :caption => :label_last_notes, :inline => false),
+      QueryColumn.new(:spent_hours, :default_order => 'desc', :caption => :label_spent_time, :totalable => true)
   ]
 
   def initialize(attributes=nil, *args)
@@ -304,21 +305,14 @@ class StateIssueQuery < Query
     end
 
     issues = scope.to_a
-
-    if has_column?(:spent_hours)
-      Issue.load_visible_spent_hours(issues)
-    end
-    if has_column?(:total_spent_hours)
-      Issue.load_visible_total_spent_hours(issues)
-    end
-    if has_column?(:last_updated_by)
-      Issue.load_visible_last_updated_by(issues)
-    end
-    if has_column?(:relations)
-      Issue.load_visible_relations(issues)
-    end
-    if has_column?(:last_notes)
-      Issue.load_visible_last_notes(issues)
+    if issues.any?
+      hours_by_issue_id = TimeEntry.
+          joins(:project).
+          where(nil).
+          where(:issue_id => issues.map(&:id)).group(:issue_id).sum(:hours)
+      issues.each do |issue|
+        issue.instance_variable_set "@spent_hours", (hours_by_issue_id[issue.id] || 0.0)
+      end
     end
     issues
   rescue ::ActiveRecord::StatementInvalid => e
