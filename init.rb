@@ -3,7 +3,7 @@ require_dependency '../../plugins/project_state/app/helpers/project_state_settin
 Redmine::Plugin.register :project_state do
   name 'Project State plugin'
   author 'Default Value'
-  description 'Plugin provides functionality to track project state with ability to set issue status coloring options.'
+  description 'Plugin provides functionality to track the project current state with the ability to set the color per issue status'
   version '1.0'
   author_url 'http://default-value.com/'
   url 'https://github.com/DefaultValue/redmine-project-state'

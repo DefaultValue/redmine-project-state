@@ -31,4 +31,4 @@ For instance:
 
 ## Usage
 
-1. Go to 'Project State' page to track project state 
+1. Go to project 'State' page ('Projects' > 'Your project' > 'State') to track project state.
