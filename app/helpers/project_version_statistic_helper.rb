@@ -37,8 +37,14 @@ module ProjectVersionStatisticHelper
     unless @versions.include? issue.fixed_version_id
       @versions.push(issue.fixed_version_id)
 
-      time         = get_versions_time_statistic[issue.fixed_version_id.nil? ? 0 : issue.fixed_version_id]
-      version_name = issue.fixed_version_id.nil? ? l(:no_version) : Version.find(issue.fixed_version_id).name
+      time = get_versions_time_statistic[issue.fixed_version_id.nil? ? 0 : issue.fixed_version_id]
+      if issue.fixed_version_id.nil?
+        version_name = l(:no_version)
+      else
+        version = Version.find(issue.fixed_version_id)
+        version_date = version.effective_date ? "(#{version.effective_date.to_date.strftime("%d.%b.%Y")})" : ''
+        version_name = "#{version.name} #{version_date}"
+      end
 
       return "<tr style='border-top: 1px solid; border-bottom: 1px solid;'>
           <th></th>
@@ -48,8 +54,8 @@ module ProjectVersionStatisticHelper
           <th></th>
           <th>#{version_name}</th>
           <th></th>
-          <th>Total: #{time[0].to_f.round(2)}</th>
-          <th>Total: #{time[1].to_f.round(2)}</th>
+          <th>Estimated: #{time[0].to_f.round(2)}</th>
+          <th>Spent: #{time[1].to_f.round(2)}</th>
       </tr>"
     end
   end
