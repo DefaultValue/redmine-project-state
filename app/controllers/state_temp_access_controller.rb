@@ -23,7 +23,9 @@ class StateTempAccessController < ApplicationController
   helper :project_version_statistic
 
   def index
-    @project = Project.find(params[:id])
+    project_temp_link = ProjectTempLink.where(url_hash: params[:hash]).first
+    project_id        = project_temp_link ? project_temp_link.project_id : nil
+    @project          = Project.find(project_id)
 
     retrieve_query
 
