@@ -297,6 +297,7 @@ class StateIssueQuery < Query
   # get issues for anonimous user
   def annon_issues(options={})
     order_option = [group_by_sort_order, (options[:order] || sort_clause)].flatten.reject(&:blank?)
+
     scope = Issue.
         joins(:project).
         where('1=1').

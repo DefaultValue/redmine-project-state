@@ -29,8 +29,8 @@
 
         <tr id="issue-<%= issue.id %>" class="hascontextmenu <%= cycle('odd', 'even') %> <%= issue.css_classes %> <%= level > 0 ? "idnt idnt-#{level}" : nil %>" style="background-color: <%= color_from_status(issue.status.name) %>">
           <% query.inline_columns.each do |column| %>
-            <%= content_tag('td', column_content(column, issue), :class => column.css_classes) %>
-          <% end %>
+            <%= content_tag('td', plain_column_content(column, issue), :class => column.css_classes) %>
+        <% end %>
         </tr>
         <% query.block_columns.each do |column|
           if (text = column_content(column, issue)) && text.present? -%>
