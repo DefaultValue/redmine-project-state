@@ -1,3 +1,5 @@
+require 'securerandom'
+
 class StateController < ApplicationController
   default_search_scope :issues
 
@@ -29,6 +31,17 @@ class StateController < ApplicationController
 
   def index
     retrieve_query
+
+    project_code = params[:id]
+    link         = ProjectTempLink.find_by(:project_id => project_code)
+    if link.nil?
+      link            = ProjectTempLink.new
+      link.project_id = project_code
+      link.url_hash   = SecureRandom.uuid
+      link.save
+    end
+    link.url_hash
+    @temp_url = url_for :controller => 'state_temp_access', :action => 'index', :hash => link.url_hash
 
     if @query.valid?
       respond_to do |format|
