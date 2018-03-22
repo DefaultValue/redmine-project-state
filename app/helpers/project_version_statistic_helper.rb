@@ -53,4 +53,93 @@ module ProjectVersionStatisticHelper
       </tr>"
     end
   end
+
+  def plain_column_content(column, item)
+    value = column.value_object(item)
+    if value.is_a?(Array)
+      values = value.collect {|v| column_value(column, item, v)}.compact
+      safe_join(values, ', ')
+    else
+      plain_column_value(column, item, value)
+    end
+  end
+
+  def plain_column_value(column, item, value)
+    case column.name
+      when :id
+        value
+      when :subject
+        value
+      when :parent
+        value ? "##{value.id}" : ''
+      when :description
+        item.description? ? content_tag('div', textilizable(item, :description), :class => "wiki") : ''
+      when :last_notes
+        item.last_notes.present? ? content_tag('div', textilizable(item, :last_notes), :class => "wiki") : ''
+      when :done_ratio
+        progress_bar(value)
+      when :relations
+        content_tag('span',
+                    value.to_s(item) {|other| link_to_issue(other, :subject => false, :tracker => false)}.html_safe,
+                    :class => value.css_classes_for(item))
+      when :hours, :estimated_hours
+        format_hours(value)
+      when :spent_hours
+        format_hours(value)
+      when :total_spent_hours
+        format_hours(value)
+      when :attachments
+        value.to_a.map {|a| format_object(a)}.join(" ").html_safe
+      else
+        plain_format_object(value)
+    end
+  end
+
+  # Helper that formats object for html or text rendering
+  def plain_format_object(object, html=true, &block)
+    if block_given?
+      object = yield object
+    end
+    case object.class.name
+      when 'Array'
+        formatted_objects = object.map {|o| format_object(o, html)}
+        html ? safe_join(formatted_objects, ', ') : formatted_objects.join(', ')
+      when 'Time'
+        format_time(object)
+      when 'Date'
+        format_date(object)
+      when 'Fixnum'
+        object.to_s
+      when 'Float'
+        sprintf "%.2f", object
+      when 'User'
+        object.to_s
+      when 'Project'
+        object.to_s
+      when 'Version'
+        object.to_s
+      when 'TrueClass'
+        l(:general_text_Yes)
+      when 'FalseClass'
+        l(:general_text_No)
+      when 'Issue'
+        "##{object.id}"
+      when 'Attachment'
+       object.filename
+      when 'CustomValue', 'CustomFieldValue'
+        if object.custom_field
+          f = object.custom_field.format.formatted_custom_value(self, object, html)
+          if f.nil? || f.is_a?(String)
+            f
+          else
+            format_object(f, html, &block)
+          end
+        else
+          object.value.to_s
+        end
+      else
+        html ? h(object) : object.to_s
+    end
+  end
+
 end
