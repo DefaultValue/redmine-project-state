@@ -282,6 +282,49 @@ class StateIssueQuery < Query
     raise StatementInvalid.new(e.message)
   end
 
+  # get issues for anonimous user
+  def annon_issues(options={})
+    order_option = [group_by_sort_order, (options[:order] || sort_clause)].flatten.reject(&:blank?)
+
+    scope = Issue.joins(:project).
+        where('1=1').
+        joins(:status, :project).
+        preload(:priority).
+        where(statement).
+        includes(([:status, :project] + (options[:include] || [])).uniq).
+        where(options[:conditions]).
+        order(order_option).
+        joins(joins_for_order_statement(order_option.join(','))).
+        limit(options[:limit]).
+        offset(options[:offset])
+
+    scope = scope.preload([:tracker, :author, :assigned_to, :fixed_version, :category, :attachments] & columns.map(&:name))
+    if has_custom_field_column?
+      scope = scope.preload(:custom_values)
+    end
+
+    issues = scope.to_a
+
+    if has_column?(:spent_hours)
+      Issue.load_visible_spent_hours(issues)
+    end
+    if has_column?(:total_spent_hours)
+      Issue.load_visible_total_spent_hours(issues)
+    end
+    if has_column?(:last_updated_by)
+      Issue.load_visible_last_updated_by(issues)
+    end
+    if has_column?(:relations)
+      Issue.load_visible_relations(issues)
+    end
+    if has_column?(:last_notes)
+      Issue.load_visible_last_notes(issues)
+    end
+    issues
+  rescue ::ActiveRecord::StatementInvalid => e
+    raise StatementInvalid.new(e.message)
+  end
+
   # Returns the issues ids
   def issue_ids(options={})
     order_option = [group_by_sort_order, (options[:order] || sort_clause)].flatten.reject(&:blank?)

@@ -32,7 +32,7 @@ class StateTempAccessController < ApplicationController
         format.html {
           @issue_count = @query.issue_count
           @issue_pages = Paginator.new @issue_count, per_page_option, params['page']
-          @issues = @query.issues(:order => "fixed_version_id DESC, priority_id DESC",:offset => @issue_pages.offset, :limit => @issue_pages.per_page)
+          @issues = @query.annon_issues(:order => "fixed_version_id DESC, priority_id DESC",:offset => @issue_pages.offset, :limit => @issue_pages.per_page)
           render :layout => !request.xhr?
         }
       end
