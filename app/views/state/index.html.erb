@@ -7,7 +7,7 @@
 <h2><%= l(:label_project_state) %></h2>
 <% html_title l(:label_project_state) %>
 
-<span>Project state share URL: <%= @temp_url %></span>
+<span class="share-url">Project state share URL: <%= @temp_url %></span>
 
 <%= form_tag("/projects/#{@project.identifier}/state", :method => :get, :id => 'query_form') do %>
   <%= render :partial => 'state/query_form' %>
@@ -77,4 +77,5 @@
   .issue {color: black;}
   .issue a {color: black; text-decoration: none;}
   table.list tr.issue a { color: black !important;}
+  .share-url {display: inline-block; padding-bottom: 20px}
 </style>
