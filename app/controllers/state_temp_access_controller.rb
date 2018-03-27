@@ -32,8 +32,8 @@ class StateTempAccessController < ApplicationController
     if @query.valid?
       respond_to do |format|
         format.html {
-          @issue_count = @query.issue_count
-          @issue_pages = Paginator.new @issue_count, per_page_option, params['page']
+          @issue_count = @query.annon_issue_count
+          @issue_pages = Paginator.new @issue_count, custom_per_page_option, params['page']
           @issues = @query.annon_issues(:order => "fixed_version_id DESC, priority_id DESC",:offset => @issue_pages.offset, :limit => @issue_pages.per_page)
           render :layout => !request.xhr?
         }
@@ -47,6 +47,18 @@ class StateTempAccessController < ApplicationController
     end
   rescue ActiveRecord::RecordNotFound
     render_404
+  end
+
+  def custom_per_page_option
+    if params[:per_page] && Setting.per_page_options_array.include?(params[:per_page].to_s.to_i)
+      per_page = params[:per_page].to_s.to_i
+      session[:per_page] = per_page
+    elsif session[:per_page]
+      per_page = session[:per_page]
+    else
+      per_page = 1000
+    end
+    per_page
   end
 
 end

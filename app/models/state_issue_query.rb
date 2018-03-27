@@ -226,6 +226,17 @@ class StateIssueQuery < Query
     raise StatementInvalid.new(e.message)
   end
 
+  def annon_issue_count
+    Issue.
+        joins(:project).
+        where('1=1').
+        joins(:status, :project).
+        where(project_statement).
+        count
+  rescue ::ActiveRecord::StatementInvalid => e
+    raise StatementInvalid.new(e.message)
+  end
+
   # Returns sum of all the issue's estimated_hours
   def total_for_estimated_hours(scope)
     map_total(scope.sum(:estimated_hours)) {|t| t.to_f.round(2)}
@@ -287,11 +298,12 @@ class StateIssueQuery < Query
   def annon_issues(options={})
     order_option = [group_by_sort_order, (options[:order] || sort_clause)].flatten.reject(&:blank?)
 
-    scope = Issue.joins(:project).
+    scope = Issue.
+        joins(:project).
         where('1=1').
         joins(:status, :project).
         preload(:priority).
-        where(statement).
+        where(project_statement).
         includes(([:status, :project] + (options[:include] || [])).uniq).
         where(options[:conditions]).
         order(order_option).
